@@ -1,9 +1,9 @@
 /** @format */
 
 import { Injectable } from "@nestjs/common";
-import { UserRepository } from "../../../domain/repositories/user.repository";
-import { User } from "../../../domain/entities/user.entity";
-import db from "../models/index";
+import { UserRepository } from "../../core/repositories/user.repository";
+import { User } from "../../core/entities/user.entity";
+import db from "../database/models/index";
 import { Op } from "sequelize";
 
 @Injectable()
