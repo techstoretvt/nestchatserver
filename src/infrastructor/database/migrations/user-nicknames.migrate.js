@@ -11,11 +11,23 @@ module.exports = {
 
       user_id: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       friend_id: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       nickname: {
         type: Sequelize.STRING

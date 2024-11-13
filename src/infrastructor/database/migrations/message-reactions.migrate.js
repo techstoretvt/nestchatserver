@@ -11,19 +11,31 @@ module.exports = {
 
       message_id: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        references: {
+          model: 'Messages',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       user_id: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       icon_type: {
         allowNull: false,
         type: Sequelize.STRING
       },
       icon_count: {
-        allowNull: false,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue: 1
       },
 
 

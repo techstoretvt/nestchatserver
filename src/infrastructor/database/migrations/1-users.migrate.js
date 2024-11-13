@@ -24,6 +24,8 @@ module.exports = {
         type: Sequelize.TEXT
       },
       auth_provider: {
+        allowNull: false,
+        defaultValue: 'local',
         type: Sequelize.STRING
       },
       provider_id: {
@@ -33,10 +35,12 @@ module.exports = {
         type: Sequelize.DOUBLE
       },
       is_online: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       last_seen: {
-        type: Sequelize.DOUBLE
+        type: Sequelize.DOUBLE,
+        defaultValue: 0
       },
       role: {
         allowNull: false,

@@ -2,29 +2,31 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Conversations', {
+    await queryInterface.createTable('ConversationSettings', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.STRING
       },
 
-      group_name: {
-        type: Sequelize.STRING
+      conversation_id: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'Conversations',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      is_group: {
-        type: Sequelize.BOOLEAN
-      },
-      last_message_at: {
-        type: Sequelize.DOUBLE
-      },
-      background_image: {
-        type: Sequelize.TEXT
-      },
-      status: {
+      setting_name: {
         allowNull: false,
         type: Sequelize.STRING
       },
+      setting_value: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+
 
 
       createdAt: {
@@ -38,6 +40,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Conversations');
+    await queryInterface.dropTable('ConversationSettings');
   }
 };

@@ -37,7 +37,6 @@ const production = {
   dialectOptions: {
     bigNumberStrings: true,
     ssl: {
-      // ca: readFileSync(__dirname + '/mysql-ca-main.crt'),
       require: true,
       rejectUnauthorized: false
     },

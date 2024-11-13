@@ -2,15 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('BlockedUsers', {
+    await queryInterface.createTable('Messages', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.STRING
       },
 
-      user_id: {
+      conversation_id: {
         allowNull: false,
+        type: Sequelize.STRING,
+        references: {
+          model: 'Conversations',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      sender_id: {
         type: Sequelize.STRING,
         references: {
           model: 'Users',
@@ -19,15 +28,20 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      friend_id: {
+      message_type: {
         allowNull: false,
+        type: Sequelize.STRING
+      },
+      content: {
+        type: Sequelize.TEXT
+      },
+      status: {
         type: Sequelize.STRING,
-        references: {
-          model: 'Users',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        defaultValue: 'sent',
+      }, // sent, recieved, seen
+      is_pined: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
 
 
@@ -42,6 +56,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('BlockedUsers');
+    await queryInterface.dropTable('Messages');
   }
 };

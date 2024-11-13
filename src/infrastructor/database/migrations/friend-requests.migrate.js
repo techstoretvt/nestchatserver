@@ -11,19 +11,31 @@ module.exports = {
 
       from_user_id: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       to_user_id: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       request_message: {
         allowNull: false,
         type: Sequelize.STRING
       },
       status: {
-        allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        defaultValue: 'pending',
       },  // pending, accepted, canceled
       response_time: {
         type: Sequelize.DOUBLE

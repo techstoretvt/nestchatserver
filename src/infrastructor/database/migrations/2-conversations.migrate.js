@@ -2,32 +2,30 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Messages', {
+    await queryInterface.createTable('Conversations', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.STRING
       },
 
-      conversation_id: {
+      group_name: {
+        type: Sequelize.STRING
+      },
+      is_group: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.BOOLEAN
       },
-      sender_id: {
-        type: Sequelize.STRING
+      last_message_at: {
+        type: Sequelize.DOUBLE,
+        defaultValue: 0
       },
-      message_type: {
-        allowNull: false,
-        type: Sequelize.STRING
-      },
-      content: {
+      background_image: {
         type: Sequelize.TEXT
       },
       status: {
-        type: Sequelize.STRING
-      }, // sent, recieved, seen
-      is_pined: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.STRING,
+        defaultValue: 'active',
       },
 
 
@@ -42,6 +40,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Messages');
+    await queryInterface.dropTable('Conversations');
   }
 };
