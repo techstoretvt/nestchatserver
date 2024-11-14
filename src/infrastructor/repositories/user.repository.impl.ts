@@ -1,8 +1,8 @@
 /** @format */
 
 import { Injectable } from "@nestjs/common";
-import { UserRepository } from "../../core/repositories/user.repository";
-import { User } from "../../core/entities/user.entity";
+import { UserRepository } from "../../domain/repositories/user.repository";
+import { User } from "../../domain/entities/user.entity";
 import db from "../database/models/index";
 import { Op } from "sequelize";
 
@@ -29,14 +29,14 @@ export class UserRepositoryImpl implements UserRepository {
 
         let newUser = new User(row.id, row.full_name, row.email);
 
-        await db.Messages.create({
-            id: "DataTypes.STRING",
-            conversation_id: "DataTypes.STRING",
-            sender_id: "DataTypes.STRING",
-            message_type: "DataTypes.STRING",
-            content: "DataTypes.TEXT",
-            status: "DataTypes.STRING", // sent, recieved, seen
-        });
+        // await db.Messages.create({
+        //     id: "DataTypes.STRING",
+        //     conversation_id: "DataTypes.STRING",
+        //     sender_id: "DataTypes.STRING",
+        //     message_type: "DataTypes.STRING",
+        //     content: "DataTypes.TEXT",
+        //     status: "DataTypes.STRING", // sent, recieved, seen
+        // });
 
         return newUser;
     }

@@ -9,7 +9,7 @@ import {
     UseInterceptors,
     Get,
 } from "@nestjs/common";
-import { CreateUserUseCase } from "../../core/usecases/UserUsecases/create-user.usecase";
+import { CreateUserUseCase } from "../../domain/usecases/UserUsecases/create-user.usecase";
 import { LoggingInterceptor } from "../../middleware/interceptors/logging.interceptor";
 
 @Controller("users")

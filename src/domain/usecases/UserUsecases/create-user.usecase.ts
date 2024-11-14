@@ -2,7 +2,7 @@
 
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { User } from "../../entities/user.entity";
-import { UserRepository } from "src/core/repositories/user.repository";
+import { UserRepository } from "src/domain/repositories/user.repository";
 
 @Injectable()
 export class CreateUserUseCase {
