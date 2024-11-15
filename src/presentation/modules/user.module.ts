@@ -10,14 +10,24 @@ import {
     User,
     UserSchema,
 } from "src/infrastructor/database/schemas/user.schema";
+import { CacheModule } from "@nestjs/cache-manager";
+import { CacheConstants } from "src/common/constants/cache.constant";
+import { CqrsModule } from "@nestjs/cqrs";
+
+const ListUsercases = [CreateUserUseCase];
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+        CacheModule.register({
+            ttl: CacheConstants.CACHE_EXPIRED,
+            max: CacheConstants.MAX_RESULT,
+        }),
+        CqrsModule,
     ],
     controllers: [UserController],
     providers: [
-        CreateUserUseCase,
+        ...ListUsercases,
         {
             provide: "UserRepository",
             useClass: UserRepositoryImpl,

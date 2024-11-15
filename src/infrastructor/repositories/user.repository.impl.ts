@@ -32,11 +32,11 @@ export class UserRepositoryImpl implements UserRepository {
 
         let newUser = new UserEntity(row.id, row.full_name, row.email);
 
-        const createdUser = new this.userModel({
-            name: "name",
-            email: "email",
-        });
-        createdUser.save();
+        // const createdUser = new this.userModel({
+        //     name: "name",
+        //     email: "email",
+        // });
+        // createdUser.save();
 
         // await db.Messages.create({
         //     id: "DataTypes.STRING",

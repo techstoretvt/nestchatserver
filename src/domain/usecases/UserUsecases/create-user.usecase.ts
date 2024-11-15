@@ -2,18 +2,25 @@
 
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { UserEntity } from "../../entities/user.entity";
-import { UserRepository } from "src/domain/repositories/user.repository";
+import { UserRepository } from "src/domain/interfaces/repositories/user.repository";
+import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { CreateUserCommand } from "src/application/commands/create-user.command";
 
-@Injectable()
-export class CreateUserUseCase {
+// @Injectable()
+@CommandHandler(CreateUserCommand)
+export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     constructor(
         @Inject("UserRepository")
         private readonly userRepository: UserRepository,
     ) {}
 
-    async execute(name: string, email: string): Promise<UserEntity> {
+    async execute(command: CreateUserCommand): Promise<UserEntity> {
         try {
-            const user = new UserEntity(Date.now().toString(), name, email);
+            const user = new UserEntity(
+                Date.now().toString(),
+                command.name,
+                command.email,
+            );
             return await this.userRepository.create(user);
         } catch (error) {
             console.log("vao catch usecase");

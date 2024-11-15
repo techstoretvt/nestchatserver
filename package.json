@@ -21,10 +21,14 @@
     "migrate": "npx sequelize-cli db:migrate"
   },
   "dependencies": {
+    "@nestjs/cache-manager": "^2.3.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/cqrs": "^10.2.8",
     "@nestjs/mongoose": "^10.1.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/throttler": "^6.2.1",
+    "cache-manager": "^5.7.6",
     "express": "^4.21.1",
     "mongoose": "^8.8.1",
     "pg": "^8.13.1",
