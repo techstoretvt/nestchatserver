@@ -22,7 +22,15 @@ import { Cache } from "cache-manager";
 import { CacheConstants } from "src/common/constants/cache.constant";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { CreateUserCommand } from "src/application/commands/create-user.command";
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBody,
+    ApiBearerAuth,
+} from "@nestjs/swagger";
 
+@ApiTags("users")
 @Controller("users")
 @UseInterceptors(CacheInterceptor)
 export class UserController {
@@ -38,6 +46,8 @@ export class UserController {
     ) {}
 
     @Get()
+    @ApiOperation({ summary: "Get all users" }) // Mô tả endpoint
+    @ApiResponse({ status: 200, description: "The list of users" })
     @Throttle({
         default: {
             limit: ThrottlerConstants.MESSAGE_ROUTE_LIMIT,
@@ -56,6 +66,10 @@ export class UserController {
     }
 
     @Post()
+    @ApiOperation({ summary: "Create a new user" })
+    @ApiBody({ description: "User data", type: Object })
+    @ApiResponse({ status: 201, description: "User created successfully" })
+    @ApiBearerAuth()
     async createUser(@Body() body: { name: string; email: string }) {
         try {
             // let data = this.createUserUseCase.execute(body.name, body.email);

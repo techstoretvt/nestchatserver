@@ -4,10 +4,10 @@ import { Module } from "@nestjs/common";
 import { UserModule } from "./presentation/modules/user.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
-import { AuditLogInterceptor } from "./middleware/interceptors/audit-log.interceptor";
-import { AuditLogService } from "./infrastructor/services/audit-log.service";
+import { AuditLogInterceptor } from "./middleware/interceptors/index";
+import { AuditLogService } from "./infrastructor/services/index";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
-import { ThrottlerConstants } from "./common/constants/throttler.constant";
+import { ThrottlerConstants } from "./common/constants/index";
 
 @Module({
     imports: [
