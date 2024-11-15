@@ -10,7 +10,7 @@ import {
     UseInterceptors,
     Inject,
 } from "@nestjs/common";
-import { CreateUserUseCase } from "../../domain/usecases/UserUsecases/create-user.usecase";
+import { CreateUserUseCase } from "../../application/usecases/UserUsecases/create-user.usecase";
 import { Throttle } from "@nestjs/throttler";
 import { ThrottlerConstants } from "src/common/constants/throttler.constant";
 import {

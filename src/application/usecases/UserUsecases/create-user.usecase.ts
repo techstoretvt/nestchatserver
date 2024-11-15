@@ -1,7 +1,7 @@
 /** @format */
 
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { UserEntity } from "../../entities/user.entity";
+import { UserEntity } from "../../../domain/entities/user.entity";
 import { UserRepository } from "src/domain/interfaces/repositories/user.repository";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CreateUserCommand } from "src/application/commands/create-user.command";
