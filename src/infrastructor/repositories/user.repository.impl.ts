@@ -1,21 +1,24 @@
 /** @format */
 
 import { Injectable } from "@nestjs/common";
-import { UserRepository } from "../../domain/repositories/user.repository";
-import { User } from "../../domain/entities/user.entity";
+import { UserRepository } from "../../domain/interfaces/repositories/user.repository";
+import { UserEntity } from "../../domain/entities/user.entity";
 import db from "../database/models/index";
-import { Op } from "sequelize";
+import { InjectModel } from "@nestjs/mongoose";
+import { User } from "../database/schemas/user.schema";
+import { Model } from "mongoose";
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
-    private users: User[] = [];
+    constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+    private users: UserEntity[] = [];
 
-    async save(user: User): Promise<User> {
+    async save(user: UserEntity): Promise<UserEntity> {
         this.users.push(user);
         return user;
     }
 
-    async create(user: User): Promise<User> {
+    async create(user: UserEntity): Promise<UserEntity> {
         let row = await db.Users.create({
             id: user.id,
             full_name: "DataTypes.STRING",
@@ -27,7 +30,13 @@ export class UserRepositoryImpl implements UserRepository {
             role: "DataTypes.STRING",
         });
 
-        let newUser = new User(row.id, row.full_name, row.email);
+        let newUser = new UserEntity(row.id, row.full_name, row.email);
+
+        const createdUser = new this.userModel({
+            name: "name",
+            email: "email",
+        });
+        createdUser.save();
 
         // await db.Messages.create({
         //     id: "DataTypes.STRING",
@@ -41,7 +50,7 @@ export class UserRepositoryImpl implements UserRepository {
         return newUser;
     }
 
-    async findById(id: string): Promise<User> {
+    async findById(id: string): Promise<UserEntity> {
         return this.users.find((user) => user.id === id);
     }
 }
