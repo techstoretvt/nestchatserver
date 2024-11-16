@@ -1,6 +1,6 @@
 /** @format */
 
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { UserRepository } from "../../domain/interfaces/repositories/user.repository";
 import { UserEntity } from "../../domain/entities/user.entity";
 import { InjectModel } from "@nestjs/mongoose";
@@ -28,10 +28,20 @@ export class UserRepositoryImpl implements UserRepository {
         );
 
         const createdUser = new this.userModel({
-            name: "name",
-            email: "email",
+            full_name: "full_name",
+            // username: "username2",
+            // email: "email2",
+            avatar: "avatar",
+            auth: {
+                provider: "local",
+            },
+            role: "user",
         });
-        createdUser.save();
+        try {
+            createdUser.save();
+        } catch (error) {
+            throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         return newUser;
     }

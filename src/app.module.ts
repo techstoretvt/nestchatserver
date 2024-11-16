@@ -8,18 +8,32 @@ import { AuditLogInterceptor } from "./middleware/interceptors/index";
 import { AuditLogService } from "./infrastructor/services/index";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { ThrottlerConstants } from "./common/constants/index";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { DatabaseConfig } from "./configs/database.config";
+
+const AppModules = [UserModule];
+
+const OtherModules = [
+    ConfigModule.forRoot({
+        isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+        imports: [ConfigModule],
+        useFactory: async (configService: ConfigService) => ({
+            uri: DatabaseConfig.getMongoUri(configService),
+        }),
+        inject: [ConfigService],
+    }),
+    ThrottlerModule.forRoot([
+        {
+            ttl: ThrottlerConstants.GLOBAL_REQUEST_TTL,
+            limit: ThrottlerConstants.GLOBAL_REQUEST_LIMIT,
+        },
+    ]),
+];
 
 @Module({
-    imports: [
-        UserModule,
-        MongooseModule.forRoot("mongodb://localhost/quychat"),
-        ThrottlerModule.forRoot([
-            {
-                ttl: ThrottlerConstants.GLOBAL_REQUEST_TTL,
-                limit: ThrottlerConstants.GLOBAL_REQUEST_LIMIT,
-            },
-        ]),
-    ],
+    imports: [...OtherModules, ...AppModules],
     controllers: [],
     providers: [
         {
