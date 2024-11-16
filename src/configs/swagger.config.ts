@@ -1,7 +1,11 @@
 /** @format */
 
 import { INestApplication } from "@nestjs/common";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import {
+    DocumentBuilder,
+    SwaggerDocumentOptions,
+    SwaggerModule,
+} from "@nestjs/swagger";
 import { SwaggerConstants } from "../common/constants/index";
 
 export const setupSwagger = (app: INestApplication<any>) => {
@@ -12,8 +16,13 @@ export const setupSwagger = (app: INestApplication<any>) => {
         .addBearerAuth() // Nếu có dùng JWT Authentication
         .build();
 
-    const document = SwaggerModule.createDocument(app, config);
+    const options: SwaggerDocumentOptions = {
+        ignoreGlobalPrefix: false,
+    };
 
-    // Endpoint hiển thị giao diện Swagger
-    SwaggerModule.setup("api", app, document);
+    const documentFactory = () =>
+        SwaggerModule.createDocument(app, config, options);
+
+    // Add the global prefix to Swagger
+    SwaggerModule.setup("/api", app, documentFactory);
 };
