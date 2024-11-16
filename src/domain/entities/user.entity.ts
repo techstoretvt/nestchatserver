@@ -2,15 +2,15 @@
 import { Exclude, Expose } from "class-transformer";
 
 export class UserEntity {
-    constructor(
-        public _id: string,
-        public _name: string,
-        public _email: string,
-    ) {
-        this.id = _id;
-        this.name = _name;
-        this.email = _email;
-    }
+    // constructor(
+    //     public _id: string,
+    //     public _name: string,
+    //     public _email: string,
+    // ) {
+    //     this.id = _id;
+    //     this.name = _name;
+    //     this.email = _email;
+    // }
 
     @Expose()
     id: string;

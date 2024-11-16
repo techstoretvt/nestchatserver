@@ -20,8 +20,6 @@ import {
 } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
 import { CacheConstants } from "src/common/constants/cache.constant";
-import { CommandBus, QueryBus } from "@nestjs/cqrs";
-import { CreateUserCommand } from "src/application/commands/create-user.command";
 import {
     ApiTags,
     ApiOperation,
@@ -34,14 +32,8 @@ import {
 @Controller("users")
 @UseInterceptors(CacheInterceptor)
 export class UserController {
-    // constructor(
-    //     private readonly createUserUseCase: CreateUserUseCase,
-    //     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    // ) {}
-
     constructor(
-        private commandBus: CommandBus,
-        private queryBus: QueryBus,
+        private readonly createUserUseCase: CreateUserUseCase,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
     ) {}
 
@@ -72,10 +64,7 @@ export class UserController {
     @ApiBearerAuth()
     async createUser(@Body() body: { name: string; email: string }) {
         try {
-            // let data = this.createUserUseCase.execute(body.name, body.email);
-            let data = await this.commandBus.execute(
-                new CreateUserCommand(body.name, body.email),
-            );
+            let data = this.createUserUseCase.execute(body.name, body.email);
 
             await this.cacheManager.del(CacheConstants.GET_USERR);
             return data;

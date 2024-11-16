@@ -12,7 +12,6 @@ import {
 } from "src/infrastructor/database/schemas/user.schema";
 import { CacheModule } from "@nestjs/cache-manager";
 import { CacheConstants } from "src/common/constants/cache.constant";
-import { CqrsModule } from "@nestjs/cqrs";
 
 const ListUsercases = [CreateUserUseCase];
 
@@ -23,7 +22,6 @@ const ListUsercases = [CreateUserUseCase];
             ttl: CacheConstants.CACHE_EXPIRED,
             max: CacheConstants.MAX_RESULT,
         }),
-        CqrsModule,
     ],
     controllers: [UserController],
     providers: [

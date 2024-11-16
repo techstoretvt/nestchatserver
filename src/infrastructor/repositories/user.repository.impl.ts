@@ -3,10 +3,10 @@
 import { Injectable } from "@nestjs/common";
 import { UserRepository } from "../../domain/interfaces/repositories/user.repository";
 import { UserEntity } from "../../domain/entities/user.entity";
-import db from "../database/models/index";
 import { InjectModel } from "@nestjs/mongoose";
 import { User } from "../database/schemas/user.schema";
 import { Model } from "mongoose";
+import { plainToInstance } from "class-transformer";
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
@@ -19,33 +19,19 @@ export class UserRepositoryImpl implements UserRepository {
     }
 
     async create(user: UserEntity): Promise<UserEntity> {
-        let row = await db.Users.create({
-            id: user.id,
-            full_name: "DataTypes.STRING",
-            username: "DataTypes.STRING",
-            email: "DataTypes.STRING",
-            avatar: "DataTypes.TEXT",
-            auth_provider: "DataTypes.STRING", // local, facebook,...
-            provider_id: "DataTypes.STRING", // allow null
-            role: "DataTypes.STRING",
+        let newUser = plainToInstance(
+            UserEntity,
+            { id: user.id, name: "row.full_name", email: "row.email" },
+            {
+                excludeExtraneousValues: true,
+            },
+        );
+
+        const createdUser = new this.userModel({
+            name: "name",
+            email: "email",
         });
-
-        let newUser = new UserEntity(row.id, row.full_name, row.email);
-
-        // const createdUser = new this.userModel({
-        //     name: "name",
-        //     email: "email",
-        // });
-        // createdUser.save();
-
-        // await db.Messages.create({
-        //     id: "DataTypes.STRING",
-        //     conversation_id: "DataTypes.STRING",
-        //     sender_id: "DataTypes.STRING",
-        //     message_type: "DataTypes.STRING",
-        //     content: "DataTypes.TEXT",
-        //     status: "DataTypes.STRING", // sent, recieved, seen
-        // });
+        createdUser.save();
 
         return newUser;
     }
