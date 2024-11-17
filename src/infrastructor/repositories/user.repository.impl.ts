@@ -9,6 +9,7 @@ import { Model } from "mongoose";
 import { plainToInstance } from "class-transformer";
 import { CreateUserDto } from "src/presentation/dtos/create_user.dto";
 import { ProviderUsers, UserRoles } from "src/common/constants";
+import { PasswordUtils } from "src/common/utils/password.utils";
 
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
@@ -30,7 +31,9 @@ export class UserRepositoryImpl implements IUserRepository {
 
     async createUser(user: CreateUserDto): Promise<UserEntity> {
         try {
-            const { username, password } = user;
+            let { username, password } = user;
+            password = await PasswordUtils.hashPassword(password);
+
             const createdUser = new this.userModel({
                 full_name: username,
                 hash_password: password,

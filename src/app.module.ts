@@ -13,7 +13,7 @@ import { DatabaseConfig } from "./configs/database.config";
 import { ChatModule } from "./presentation/modules/chat.module";
 import { AuthModule } from "./presentation/modules/auth.module";
 
-const AppModules = [UserModule, ChatModule, AuthModule];
+const AppModules = [AuthModule, UserModule, ChatModule];
 
 const OtherModules = [
     ConfigModule.forRoot({

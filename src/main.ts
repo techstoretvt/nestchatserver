@@ -12,7 +12,8 @@ async function bootstrap() {
 
     app.useGlobalPipes(
         new ValidationPipe({
-            disableErrorMessages: true,
+            transform: true,
+            disableErrorMessages: false,
         }),
     );
 

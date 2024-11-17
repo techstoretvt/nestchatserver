@@ -10,6 +10,7 @@ import {
 } from "@nestjs/common";
 import { Response } from "express";
 import { Request } from "express";
+import { ResponseJsonUtils } from "../utils/response-json.utils";
 
 @Catch() // Bắt tất cả các loại exception
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -26,21 +27,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 ? exception.getStatus()
                 : HttpStatus.INTERNAL_SERVER_ERROR;
 
+        console.log(exception.getResponse());
+
         // Nếu exception không phải HttpException, lấy thông báo lỗi từ exception.message
-        const message = exception.message || "An unexpected error occurred";
+        let message = "An unexpected error occurred";
+        const exceptionResponse = exception.getResponse();
+        if (exceptionResponse && typeof exceptionResponse === "object") {
+            const messateType = typeof exceptionResponse?.message;
+            message =
+                messateType === "string"
+                    ? exceptionResponse?.message
+                    : exceptionResponse?.message[0];
+        }
 
         // Log lỗi chi tiết
         this.logger.error(`Error occurred at ${request.url}`);
         this.logger.error(exception.message);
 
         // Trả về response đẹp, cung cấp thông tin chi tiết về lỗi
-        response.status(status).json({
-            statusCode: status,
-            timestamp: new Date().toISOString(),
-            path: request.url,
-            message: message,
-            // Có thể thêm trường 'error' để cung cấp tên exception nếu cần thiết
-            error: exception.name || "UnknownError",
-        });
+        response
+            .status(status)
+            .json(
+                ResponseJsonUtils(status, message, request.url, exception.name),
+            );
     }
 }
