@@ -5,7 +5,6 @@ import { ConfigService } from "@nestjs/config";
 export class DatabaseConfig {
     static getMongoUri(configService: ConfigService): string {
         const nodeEnv = configService.get<string>("NODE_ENV", "development");
-        console.log(nodeEnv);
 
         let host: string;
         let port: string;

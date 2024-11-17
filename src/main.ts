@@ -5,18 +5,25 @@ import { AppModule } from "./app.module";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { HttpExceptionFilter } from "./common/filters/http_exception.filter";
 import { setupSwagger } from "./configs/swagger.config";
+import { ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+    app.useGlobalPipes(
+        new ValidationPipe({
+            disableErrorMessages: true,
+        }),
+    );
+
     // Interceptor
     app.useGlobalFilters(new HttpExceptionFilter());
 
-    // Cấu hình Swagger api
-    setupSwagger(app);
-
     // Global prefix
     app.setGlobalPrefix("api");
+
+    // Cấu hình Swagger api
+    setupSwagger(app);
 
     await app.listen(process.env.PORT ?? 4000);
 }

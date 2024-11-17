@@ -10,8 +10,10 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { ThrottlerConstants } from "./common/constants/index";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DatabaseConfig } from "./configs/database.config";
+import { ChatModule } from "./presentation/modules/chat.module";
+import { AuthModule } from "./presentation/modules/auth.module";
 
-const AppModules = [UserModule];
+const AppModules = [UserModule, ChatModule, AuthModule];
 
 const OtherModules = [
     ConfigModule.forRoot({

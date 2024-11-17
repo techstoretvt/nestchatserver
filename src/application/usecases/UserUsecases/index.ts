@@ -1,3 +1,3 @@
 /** @format */
 
-export * from "./create-user.usecase";
+export * from "./sign-up.usecase";

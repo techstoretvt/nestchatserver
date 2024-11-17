@@ -2,36 +2,41 @@
 
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { UserController } from "../controllers/user.controller";
+import { IUserService } from "../../domain/interfaces/services/user.service.interface";
 import { UserRepositoryImpl } from "../../infrastructor/repositories/user.repository.impl";
-import { CreateUserUseCase } from "../../application/usecases/UserUsecases/index";
 import { LoggerMiddleware } from "../../middleware/logger.middleware";
 import { MongooseModule } from "@nestjs/mongoose";
 import {
     User,
     UserSchema,
 } from "src/infrastructor/database/schemas/user.schema";
-import { CacheModule } from "@nestjs/cache-manager";
-import { CacheConstants } from "src/common/constants/cache.constant";
+import { cacheConfig } from "src/configs/cache.config";
+import { UserServiceImpl } from "src/infrastructor/services/user.service.impl";
 
-const ListUsercases = [CreateUserUseCase];
+const ListUsercases = [];
+
+const ListServices = [
+    {
+        provide: "IUserService",
+        useClass: UserServiceImpl,
+    },
+];
+
+const ListRepositories = [
+    {
+        provide: "IUserRepository",
+        useClass: UserRepositoryImpl,
+    },
+];
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-        CacheModule.register({
-            ttl: CacheConstants.CACHE_EXPIRED,
-            max: CacheConstants.MAX_RESULT,
-        }),
+        cacheConfig(),
     ],
     controllers: [UserController],
-    providers: [
-        ...ListUsercases,
-        {
-            provide: "UserRepository",
-            useClass: UserRepositoryImpl,
-        },
-    ],
-    exports: ["UserRepository", CreateUserUseCase],
+    providers: [...ListUsercases, ...ListServices, ...ListRepositories],
+    exports: ["IUserRepository", "IUserService"],
 })
 export class UserModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

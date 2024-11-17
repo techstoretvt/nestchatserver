@@ -10,14 +10,17 @@ export class User {
     @Prop({ required: true })
     full_name: string;
 
-    @Prop({ unique: true })
+    @Prop()
     username: string;
 
-    @Prop({ unique: true, sparse: true, default: null })
+    @Prop({ sparse: true, default: null })
     email: string;
 
     @Prop({ required: true })
     avatar: string;
+
+    @Prop()
+    hash_password: string;
 
     @Prop({
         type: {

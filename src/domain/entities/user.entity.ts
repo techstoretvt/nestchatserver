@@ -1,26 +1,37 @@
 /** @format */
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
+
+class Auth {
+    @Expose()
+    provider: string;
+
+    @Expose()
+    provider_id: string;
+}
 
 export class UserEntity {
-    // constructor(
-    //     public _id: string,
-    //     public _name: string,
-    //     public _email: string,
-    // ) {
-    //     this.id = _id;
-    //     this.name = _name;
-    //     this.email = _email;
-    // }
-
     @Expose()
     id: string;
 
     @Expose()
-    name: string;
+    full_name: string;
 
     @Expose()
     email: string;
 
+    @Expose()
+    username: string;
+
+    @Expose()
+    avatar: string;
+
+    @Expose()
+    @Type(() => Auth)
+    auth: Auth;
+
+    @Expose()
+    role: string;
+
     @Exclude()
-    password: string;
+    hash_password: string;
 }

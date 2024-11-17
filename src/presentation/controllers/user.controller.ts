@@ -10,7 +10,6 @@ import {
     UseInterceptors,
     Inject,
 } from "@nestjs/common";
-import { CreateUserUseCase } from "../../application/usecases/UserUsecases/create-user.usecase";
 import { Throttle } from "@nestjs/throttler";
 import { ThrottlerConstants } from "src/common/constants/throttler.constant";
 import {
@@ -28,14 +27,9 @@ import {
     ApiBearerAuth,
 } from "@nestjs/swagger";
 
-@ApiTags("users")
 @Controller("users")
-@UseInterceptors(CacheInterceptor)
 export class UserController {
-    constructor(
-        private readonly createUserUseCase: CreateUserUseCase,
-        @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    ) {}
+    constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
     @Get()
     @ApiOperation({ summary: "Get all users" }) // Mô tả endpoint
@@ -57,28 +51,28 @@ export class UserController {
         };
     }
 
-    @Post()
-    @ApiOperation({ summary: "Create a new user" })
-    @ApiBody({ description: "User data", type: Object })
-    @ApiResponse({ status: 201, description: "User created successfully" })
-    @ApiBearerAuth()
-    async createUser(@Body() body: { name: string; email: string }) {
-        try {
-            let data = this.createUserUseCase.execute(body.name, body.email);
+    // @Post()
+    // @ApiOperation({ summary: "Create a new user" })
+    // @ApiBody({ description: "User data", type: Object })
+    // @ApiResponse({ status: 201, description: "User created successfully" })
+    // @ApiBearerAuth()
+    // async createUser(@Body() body: { name: string; email: string }) {
+    //     try {
+    //         let data = this.createUserUseCase.execute(body.name, body.email);
 
-            await this.cacheManager.del(CacheConstants.GET_USERR);
-            return data;
-        } catch (error) {
-            // Handle and log the error, then return a friendly message
-            console.log("vao catch");
+    //         await this.cacheManager.del(CacheConstants.GET_USERR);
+    //         return data;
+    //     } catch (error) {
+    //         // Handle and log the error, then return a friendly message
+    //         console.log("vao catch");
 
-            console.error(error); // Log lỗi ra console
+    //         console.error(error); // Log lỗi ra console
 
-            // Trả về lỗi thông qua HttpException
-            throw new HttpException(
-                "Something went wrong!",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-            );
-        }
-    }
+    //         // Trả về lỗi thông qua HttpException
+    //         throw new HttpException(
+    //             "Something went wrong!",
+    //             HttpStatus.INTERNAL_SERVER_ERROR,
+    //         );
+    //     }
+    // }
 }
