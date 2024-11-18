@@ -31,7 +31,6 @@ export class User {
             },
             provider_id: { type: String },
         },
-        required: true,
     })
     auth: {
         provider: string;

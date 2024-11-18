@@ -27,17 +27,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 ? exception.getStatus()
                 : HttpStatus.INTERNAL_SERVER_ERROR;
 
-        console.log(exception.getResponse());
-
         // Nếu exception không phải HttpException, lấy thông báo lỗi từ exception.message
         let message = "An unexpected error occurred";
-        const exceptionResponse = exception.getResponse();
-        if (exceptionResponse && typeof exceptionResponse === "object") {
-            const messateType = typeof exceptionResponse?.message;
-            message =
-                messateType === "string"
-                    ? exceptionResponse?.message
-                    : exceptionResponse?.message[0];
+
+        try {
+            const exceptionResponse = exception.getResponse();
+            if (exceptionResponse && typeof exceptionResponse === "object") {
+                const messateType = typeof exceptionResponse?.message;
+                message =
+                    messateType === "string"
+                        ? exceptionResponse?.message
+                        : exceptionResponse?.message[0];
+            }
+        } catch (error) {
+            message = exception?.message || "An unexpected error occurred";
         }
 
         // Log lỗi chi tiết
@@ -45,10 +48,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         this.logger.error(exception.message);
 
         // Trả về response đẹp, cung cấp thông tin chi tiết về lỗi
-        response
-            .status(status)
-            .json(
-                ResponseJsonUtils(status, message, request.url, exception.name),
-            );
+        response.status(status).json(
+            ResponseJsonUtils(status, message, {
+                path: request.url,
+                exceptionName: exception.name,
+            }),
+        );
     }
 }

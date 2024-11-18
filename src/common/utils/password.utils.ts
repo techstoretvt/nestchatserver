@@ -27,13 +27,4 @@ export const PasswordUtils = {
 
         return schema.validate(password, { details: true }) as any;
     },
-
-    hashPassword: async (password: string) => {
-        const salt = await bcrypt.genSalt();
-        return await bcrypt.hash(password, salt);
-    },
-
-    comparePassword: async (password: string, hash: string) => {
-        return await bcrypt.compare(password, hash);
-    },
 };

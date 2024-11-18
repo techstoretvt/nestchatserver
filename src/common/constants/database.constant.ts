@@ -10,3 +10,5 @@ export const ProviderUsers = {
     GOOGLE: "google",
     FACEBOOK: "facebook",
 };
+
+export const avatarDefault = "avatar";
