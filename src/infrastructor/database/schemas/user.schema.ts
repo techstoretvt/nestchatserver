@@ -46,8 +46,8 @@ export class User {
     @Prop()
     last_seen: number;
 
-    @Prop({ required: true, enum: ["user", "admin"] })
-    role: string;
+    @Prop({ required: true })
+    role: Types.ObjectId;
 
     @Prop([
         {

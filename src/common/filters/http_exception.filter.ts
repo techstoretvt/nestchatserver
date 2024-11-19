@@ -12,7 +12,7 @@ import { Response } from "express";
 import { Request } from "express";
 import { ResponseJsonUtils } from "../utils/response-json.utils";
 
-@Catch() // Bắt tất cả các loại exception
+@Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
     private readonly logger = new Logger(HttpExceptionFilter.name);
 

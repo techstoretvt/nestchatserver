@@ -1,6 +1,6 @@
 /** @format */
 
-import { Module } from "@nestjs/common";
+import { Module, OnModuleInit } from "@nestjs/common";
 import { UserModule } from "./presentation/modules/user.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
@@ -12,8 +12,11 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DatabaseConfig } from "./configs/database.config";
 import { ChatModule } from "./presentation/modules/chat.module";
 import { AuthModule } from "./presentation/modules/auth.module";
+import { UserRepositoryImpl } from "./infrastructor/repositories";
+import { SeedService } from "./infrastructor/services/seed.service.impl";
+import { RoleModule } from "./presentation/modules/role.module";
 
-const AppModules = [AuthModule, UserModule, ChatModule];
+const AppModules = [AuthModule, UserModule, ChatModule, RoleModule];
 
 const OtherModules = [
     ConfigModule.forRoot({
@@ -46,8 +49,14 @@ const OtherModules = [
             provide: APP_GUARD,
             useClass: ThrottlerGuard, // Đăng ký Rate Limits với Throttler
         },
-
         AuditLogService,
+        SeedService,
     ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+    constructor(private readonly seedService: SeedService) {}
+
+    async onModuleInit() {
+        await this.seedService.seed();
+    }
+}

@@ -14,6 +14,26 @@ import { avatarDefault, ProviderUsers, UserRoles } from "src/common/constants";
 export class UserRepositoryImpl implements IUserRepository {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
+    async seedUser(data: any): Promise<void> {
+        let newAdmin = new this.userModel({
+            full_name: data.full_name,
+            hash_password: data.hash_password,
+            username: data.username,
+            avatar: avatarDefault,
+            auth: {
+                provider: ProviderUsers.LOCAL,
+            },
+            role: data.role_id,
+        });
+        await newAdmin.save();
+    }
+
+    createSuperAdmin(): Promise<void> {
+        console.log("createSuperAdmin...");
+
+        throw new Error("Method not implemented.");
+    }
+
     async getUserById(user_id: string): Promise<UserEntity> {
         let user = await this.userModel.findOne({ _id: user_id }).exec();
 
@@ -38,6 +58,9 @@ export class UserRepositoryImpl implements IUserRepository {
             const user = await this.userModel
                 .findOne({ username: username })
                 .exec();
+            if (!user) {
+                throw new NotFoundException("User not found");
+            }
 
             let userEntity: UserEntity = plainToInstance(UserEntity, user, {
                 excludeExtraneousValues: true,

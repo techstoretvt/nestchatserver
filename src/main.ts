@@ -10,6 +10,9 @@ import { ValidationPipe } from "@nestjs/common";
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+    // guard
+
+    // pipe
     app.useGlobalPipes(
         new ValidationPipe({
             transform: true,

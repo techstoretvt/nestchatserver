@@ -8,4 +8,6 @@ export interface IUserRepository {
     createUser(user: CreateUserDto): Promise<UserEntity>;
     updateUserLastLogin(user_id: string): Promise<void>;
     getUserById(user_id: string): Promise<UserEntity>;
+    createSuperAdmin(): Promise<void>;
+    seedUser(data?: any): Promise<void>;
 }

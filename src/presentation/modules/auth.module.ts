@@ -1,6 +1,6 @@
 /** @format */
 
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { SignUpUseCase } from "../../application/usecases/UserUsecases/index";
 import {
     AuthServiceImpl,
@@ -17,6 +17,7 @@ import {
 import { JwtModule } from "@nestjs/jwt";
 import { jwtTokenConstants } from "src/common/constants/jwt.constant";
 import { SignInUseCase } from "src/application/usecases/UserUsecases/sign-in.usecase";
+import { AppTypeMiddleware } from "src/middleware/app.middleware";
 
 const ListUsercases = [SignUpUseCase, SignInUseCase];
 
@@ -38,5 +39,10 @@ const ListServices = [
     ],
     controllers: [AuthController],
     providers: [...ListUsercases, ...ListServices],
+    exports: ["IAuthService", "IUserService", "IUserRepository"],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(AppTypeMiddleware).forRoutes("auth/signin");
+    }
+}

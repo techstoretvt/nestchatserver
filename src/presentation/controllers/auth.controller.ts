@@ -5,20 +5,26 @@ import {
     Body,
     Controller,
     HttpCode,
+    HttpStatus,
     Post,
+    Req,
     Res,
+    SetMetadata,
+    UseGuards,
 } from "@nestjs/common";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { SignUpUseCase } from "src/application/usecases/UserUsecases/index";
-import { ApiBody, ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { HttpStatusCodeConstants } from "src/common/constants";
+import { ApiBody, ApiHeader, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { UserEntity } from "src/domain/entities/user.entity";
 import { PasswordUtils } from "src/common/utils/password.utils";
 import { SignInDto } from "../dtos/sign-in.dto";
 import { ResponseJsonUtils } from "src/common/utils/response-json.utils";
 import { SignInUseCase } from "src/application/usecases/UserUsecases/sign-in.usecase";
+import { Response, Request } from "express";
+import { ApiKeyGuard } from "src/middleware/guards/api-key.guard";
 
 @Controller("auth")
+@UseGuards(ApiKeyGuard)
 export class AuthController {
     constructor(
         private readonly signUpUseCase: SignUpUseCase,
@@ -26,19 +32,19 @@ export class AuthController {
     ) {}
 
     @Post("signup")
-    @HttpCode(HttpStatusCodeConstants.CREATED)
+    @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: "Sign up" })
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({
-        status: HttpStatusCodeConstants.CREATED,
+        status: HttpStatus.CREATED,
         description: "Create user successfully",
     })
     @ApiResponse({
-        status: HttpStatusCodeConstants.BAD_REQUEST,
+        status: HttpStatus.BAD_REQUEST,
         description: "Bad Request",
     })
     @ApiResponse({
-        status: HttpStatusCodeConstants.CONFLICT,
+        status: HttpStatus.CONFLICT,
         description: "User already exists",
     })
     async signUp(@Body() createUserDto: CreateUserDto) {
@@ -53,7 +59,7 @@ export class AuthController {
             await this.signUpUseCase.execute(createUserDto);
 
         return ResponseJsonUtils(
-            HttpStatusCodeConstants.CREATED,
+            HttpStatus.CREATED,
             "Create user successfully",
             {
                 data: newUser,
@@ -62,32 +68,61 @@ export class AuthController {
     }
 
     @Post("signin")
-    @HttpCode(HttpStatusCodeConstants.OK)
+    @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: "Sign in" })
     @ApiBody({ type: SignInDto })
+    @ApiHeader({
+        name: "x-app-type",
+        required: true,
+        description: "The app type (Web, Mobile, Desktop)",
+        example: "Web",
+    })
     @ApiResponse({
-        status: HttpStatusCodeConstants.OK,
+        status: HttpStatus.OK,
         description: "Sign in successfully",
     })
     @ApiResponse({
-        status: HttpStatusCodeConstants.BAD_REQUEST,
+        status: HttpStatus.BAD_REQUEST,
         description: "Bad Request",
     })
     @ApiResponse({
-        status: HttpStatusCodeConstants.NOT_FOUND,
+        status: HttpStatus.NOT_FOUND,
         description: "User not found",
     })
     @ApiResponse({
-        status: HttpStatusCodeConstants.UNAUTHORIZED,
+        status: HttpStatus.UNAUTHORIZED,
         description: "Unauthorized",
     })
-    async signIn(@Body() singInDto: SignInDto) {
+    async signIn(
+        @Body() singInDto: SignInDto,
+        @Req() req: Request,
+        @Res() res: Response,
+    ) {
         const tokens = await this.signInUseCase.execute(singInDto);
 
-        return ResponseJsonUtils(
-            HttpStatusCodeConstants.OK,
-            "Sign in successfully",
-            tokens,
+        const appType = req.headers["x-app-type"];
+
+        if (appType === "Mobile") {
+            // Nếu là mobile client, chỉ gửi token mà không lưu vào cookie
+            return res.json(
+                ResponseJsonUtils(
+                    HttpStatus.OK,
+                    "Sign in successfully",
+                    tokens,
+                ),
+            );
+        }
+
+        res.cookie("refreshToken", tokens.refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+
+        return res.json(
+            ResponseJsonUtils(HttpStatus.OK, "Sign in successfully", {
+                accessToken: tokens.accessToken,
+            }),
         );
     }
 }
