@@ -23,8 +23,9 @@ export class SeedService implements ISeedService {
 
     async seedUser(): Promise<void> {
         try {
-            let user =
-                await this.userRepository.getUserByUsername("super_admin");
+            let user = await this.userRepository.getUserByUsername(
+                process.env.SUPER_ADMIN_USERNAME,
+            );
             if (user) return;
         } catch (error) {}
         let userRole = await this.roleRepository.getRoleByName("super_admin");
@@ -34,7 +35,7 @@ export class SeedService implements ISeedService {
         );
         await this.userRepository.seedUser({
             full_name: "Super Admin",
-            username: "super_admin",
+            username: "superadmin",
             hash_password: hash_password,
             role_id: userRole._id,
         });

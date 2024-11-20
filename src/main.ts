@@ -6,9 +6,14 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { HttpExceptionFilter } from "./common/filters/http_exception.filter";
 import { setupSwagger } from "./configs/swagger.config";
 import { ValidationPipe } from "@nestjs/common";
+import { join } from "path";
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+    app.useStaticAssets(join(__dirname, "..", "public"), {
+        prefix: "/public/",
+    });
 
     // guard
 

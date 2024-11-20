@@ -24,7 +24,6 @@ import { Response, Request } from "express";
 import { ApiKeyGuard } from "src/middleware/guards/api-key.guard";
 
 @Controller("auth")
-@UseGuards(ApiKeyGuard)
 export class AuthController {
     constructor(
         private readonly signUpUseCase: SignUpUseCase,
