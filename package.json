@@ -21,6 +21,7 @@
     "migrate": "npx sequelize-cli db:migrate"
   },
   "dependencies": {
+    "@liaoliaots/nestjs-redis": "^10.0.0",
     "@nestjs/cache-manager": "^2.3.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/common": "^10.0.0",
@@ -38,6 +39,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "express": "^4.21.1",
+    "ioredis": "^5.4.1",
     "mongoose": "^8.8.1",
     "password-validator": "^5.3.0",
     "reflect-metadata": "^0.2.0",

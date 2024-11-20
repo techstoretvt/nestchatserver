@@ -84,7 +84,7 @@ export class UserEntity {
     @Expose()
     role: string;
 
-    @Expose()
+    @Exclude()
     hash_password: string;
 
     @Expose()

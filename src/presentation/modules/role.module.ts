@@ -11,7 +11,6 @@ import {
     RoleSchema,
 } from "src/infrastructor/database/schemas/role.schema";
 import { RoleResitoryImpl } from "src/infrastructor/repositories/role.repository.impl";
-import { AuthModule } from "./auth.module";
 
 @Module({
     imports: [

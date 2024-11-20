@@ -24,7 +24,6 @@ const ListUsercases = [SignUpUseCase, SignInUseCase];
 const ListServices = [
     { provide: "IAuthService", useClass: AuthServiceImpl },
     { provide: "IUserRepository", useClass: UserRepositoryImpl },
-    { provide: "IUserService", useClass: UserServiceImpl },
 ];
 
 @Module({
@@ -39,7 +38,7 @@ const ListServices = [
     ],
     controllers: [AuthController],
     providers: [...ListUsercases, ...ListServices],
-    exports: ["IAuthService", "IUserService", "IUserRepository"],
+    exports: ["IAuthService", "IUserRepository"],
 })
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

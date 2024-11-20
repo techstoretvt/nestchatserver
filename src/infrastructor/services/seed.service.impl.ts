@@ -1,6 +1,7 @@
 /** @format */
 
 import { Inject, Injectable } from "@nestjs/common";
+import { RoleNameConstants } from "src/common/constants";
 import {
     IUserRepository,
     IRoleRepository,
@@ -28,7 +29,9 @@ export class SeedService implements ISeedService {
             );
             if (user) return;
         } catch (error) {}
-        let userRole = await this.roleRepository.getRoleByName("super_admin");
+        let userRole = await this.roleRepository.getRoleByName(
+            RoleNameConstants.SUPERADMIN,
+        );
         if (!userRole) return;
         let hash_password = await this.authService.hashPassword(
             process.env.SUPER_ADMIN_PASSWORD,

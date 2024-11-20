@@ -13,17 +13,18 @@ import { SignInDto } from "src/presentation/dtos/sign-in.dto";
 import { JwtService } from "@nestjs/jwt";
 import { UserEntity } from "src/domain/entities/user.entity";
 import mongoose from "mongoose";
+import { IUserRepository } from "src/domain/interfaces/repositories";
 
 @Injectable()
 export class SignInUseCase {
     constructor(
         @Inject("IAuthService") private readonly authService: IAuthService,
-        @Inject("IUserService") private readonly userService: IUserService,
-        private jwtService: JwtService,
+        @Inject("IUserRepository")
+        private readonly userRepository: IUserRepository,
     ) {}
 
-    async execute(signInDto: SignInDto) {
-        let user: UserEntity = await this.userService.getUserByUsername(
+    async execute(signInDto: SignInDto, client_id: string) {
+        let user: UserEntity = await this.userRepository.getUserByUsername(
             signInDto.username,
         );
 
@@ -40,17 +41,15 @@ export class SignInUseCase {
             throw new UnauthorizedException("Invalid password");
         }
 
-        // update user
-        const userId = new mongoose.Types.ObjectId(user._id);
-        await this.userService.updateUserLastLogin(userId.toString());
+        // update last login
+        await this.userRepository.updateUserLastLogin(user._id);
 
         // create tokens
-        const accessToken = await this.userService.createAccessToken(user);
-        const refreshToken = await this.userService.createRefreshToken(user);
+        const accessToken = this.authService.createAccessToken(user);
+        const refreshToken = this.authService.createRefreshToken(user);
 
-        // save refreshToken to http cookie
-
-        // save refreshToken to redis
+        // save refresh Token to redis
+        this.authService.saveRefreshToken(user._id, refreshToken, client_id);
 
         return { accessToken, refreshToken };
     }

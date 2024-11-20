@@ -1,6 +1,10 @@
 /** @format */
 
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from "@nestjs/common";
 import { IUserRepository } from "../../domain/interfaces/repositories/user.repository.interface";
 import { UserEntity } from "../../domain/entities/user.entity";
 import { InjectModel } from "@nestjs/mongoose";
@@ -8,7 +12,11 @@ import { User } from "../database/schemas/user.schema";
 import { Model } from "mongoose";
 import { plainToInstance } from "class-transformer";
 import { CreateUserDto } from "src/presentation/dtos/create-user.dto";
-import { avatarDefault, ProviderUsers, UserRoles } from "src/common/constants";
+import {
+    avatarDefault,
+    RoleNameConstants,
+    UserProvider,
+} from "src/common/constants";
 
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
@@ -21,7 +29,7 @@ export class UserRepositoryImpl implements IUserRepository {
             username: data.username,
             avatar: avatarDefault,
             auth: {
-                provider: ProviderUsers.LOCAL,
+                provider: RoleNameConstants.USER,
             },
             role: data.role_id,
         });
@@ -59,20 +67,25 @@ export class UserRepositoryImpl implements IUserRepository {
                 .findOne({ username: username })
                 .exec();
             if (!user) {
-                throw new NotFoundException("User not found");
+                return null;
             }
 
             let userEntity: UserEntity = plainToInstance(UserEntity, user, {
                 excludeExtraneousValues: true,
             });
             userEntity._id = user._id.toString();
+            userEntity.hash_password = user.hash_password;
+
             return userEntity;
         } catch (error) {
             throw new Error(error.message);
         }
     }
 
-    async createUser(user: CreateUserDto): Promise<UserEntity> {
+    async createUser(
+        user: CreateUserDto,
+        role_id: string,
+    ): Promise<UserEntity> {
         try {
             let { username, password } = user;
 
@@ -82,9 +95,9 @@ export class UserRepositoryImpl implements IUserRepository {
                 username: username,
                 avatar: avatarDefault,
                 auth: {
-                    provider: ProviderUsers.LOCAL,
+                    provider: UserProvider.LOCAL,
                 },
-                role: UserRoles.USER,
+                role: role_id,
             });
             await createdUser.save();
             let newUser = plainToInstance(UserEntity, createdUser, {
@@ -92,7 +105,7 @@ export class UserRepositoryImpl implements IUserRepository {
             });
             return newUser;
         } catch (error) {
-            throw new Error(error.message);
+            throw new InternalServerErrorException(error.message);
         }
     }
 }

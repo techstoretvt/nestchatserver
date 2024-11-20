@@ -12,9 +12,9 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DatabaseConfig } from "./configs/database.config";
 import { ChatModule } from "./presentation/modules/chat.module";
 import { AuthModule } from "./presentation/modules/auth.module";
-import { UserRepositoryImpl } from "./infrastructor/repositories";
 import { SeedService } from "./infrastructor/services/seed.service.impl";
 import { RoleModule } from "./presentation/modules/role.module";
+import { RedisModule } from "@liaoliaots/nestjs-redis";
 
 const AppModules = [AuthModule, UserModule, ChatModule, RoleModule];
 
@@ -35,8 +35,14 @@ const OtherModules = [
             limit: ThrottlerConstants.GLOBAL_REQUEST_LIMIT,
         },
     ]),
+    RedisModule.forRoot({
+        config: {
+            host: process.env.REDIS_HOST,
+            port: parseInt(process.env.REDIS_PORT),
+            password: process.env.REDIS_PASSWORD,
+        },
+    }),
 ];
-
 @Module({
     imports: [...OtherModules, ...AppModules],
     controllers: [],

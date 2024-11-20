@@ -22,6 +22,7 @@ import { ResponseJsonUtils } from "src/common/utils/response-json.utils";
 import { SignInUseCase } from "src/application/usecases/UserUsecases/sign-in.usecase";
 import { Response, Request } from "express";
 import { ApiKeyGuard } from "src/middleware/guards/api-key.guard";
+import { ClientIdGuard } from "src/middleware/guards/client-id.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -67,6 +68,7 @@ export class AuthController {
     }
 
     @Post("signin")
+    @UseGuards(ClientIdGuard)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: "Sign in" })
     @ApiBody({ type: SignInDto })
@@ -75,6 +77,12 @@ export class AuthController {
         required: true,
         description: "The app type (Web, Mobile, Desktop)",
         example: "Web",
+    })
+    @ApiHeader({
+        name: "x-client-id",
+        required: true,
+        description: "The client id",
+        example: "client_id",
     })
     @ApiResponse({
         status: HttpStatus.OK,
@@ -97,12 +105,12 @@ export class AuthController {
         @Req() req: Request,
         @Res() res: Response,
     ) {
-        const tokens = await this.signInUseCase.execute(singInDto);
-
         const appType = req.headers["x-app-type"];
+        const client_id = req.headers["x-client-id"].toString();
+
+        const tokens = await this.signInUseCase.execute(singInDto, client_id);
 
         if (appType === "Mobile") {
-            // Nếu là mobile client, chỉ gửi token mà không lưu vào cookie
             return res.json(
                 ResponseJsonUtils(
                     HttpStatus.OK,
