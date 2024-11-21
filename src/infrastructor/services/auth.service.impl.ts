@@ -1,7 +1,11 @@
 /** @format */
 
 import { UserEntity } from "src/domain/entities/user.entity";
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+} from "@nestjs/common";
 import { IAuthService } from "src/domain/interfaces/services/auth.service.interface";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";

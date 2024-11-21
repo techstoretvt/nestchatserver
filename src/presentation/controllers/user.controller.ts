@@ -9,6 +9,10 @@ import {
     Get,
     UseInterceptors,
     Inject,
+    Param,
+    Patch,
+    Request,
+    UseGuards,
 } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
 import { ThrottlerConstants } from "src/common/constants/throttler.constant";
@@ -19,17 +23,20 @@ import {
 } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
 import { CacheConstants } from "src/common/constants/cache.constant";
-import {
-    ApiTags,
-    ApiOperation,
-    ApiResponse,
-    ApiBody,
-    ApiBearerAuth,
-} from "@nestjs/swagger";
+import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { TestUsecase } from "src/application/usecases/UserUsecases";
+import { UpdateUserDto } from "../dtos";
+import { ResponseJsonUtils } from "src/common/utils/response-json.utils";
+import { AuthGuard } from "src/middleware/guards/auth.guard";
+import { UpdateUserUsecase } from "src/application/usecases/UserUsecases/update-user.usecase";
 
 @Controller("users")
 export class UserController {
-    constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+    constructor(
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+        private readonly testUseCase: TestUsecase,
+        private readonly updateUserUseCase: UpdateUserUsecase,
+    ) {}
 
     @Get()
     @ApiOperation({ summary: "Get all users" }) // Mô tả endpoint
@@ -51,28 +58,22 @@ export class UserController {
         };
     }
 
-    // @Post()
-    // @ApiOperation({ summary: "Create a new user" })
-    // @ApiBody({ description: "User data", type: Object })
-    // @ApiResponse({ status: 201, description: "User created successfully" })
-    // @ApiBearerAuth()
-    // async createUser(@Body() body: { name: string; email: string }) {
-    //     try {
-    //         let data = this.createUserUseCase.execute(body.name, body.email);
+    @Patch("/update")
+    @UseGuards(AuthGuard)
+    async updateUser(@Body() updateUserDto: UpdateUserDto, @Request() req) {
+        let data = await this.updateUserUseCase.execute(
+            updateUserDto,
+            req.user_id,
+        );
+        return ResponseJsonUtils(HttpStatus.OK, "OK", data);
+    }
 
-    //         await this.cacheManager.del(CacheConstants.GET_USERR);
-    //         return data;
-    //     } catch (error) {
-    //         // Handle and log the error, then return a friendly message
-    //         console.log("vao catch");
-
-    //         console.error(error); // Log lỗi ra console
-
-    //         // Trả về lỗi thông qua HttpException
-    //         throw new HttpException(
-    //             "Something went wrong!",
-    //             HttpStatus.INTERNAL_SERVER_ERROR,
-    //         );
-    //     }
-    // }
+    @Post("/test/:id")
+    async test(@Body("") body: any, @Param("id") id: string) {
+        let data = await this.testUseCase.execute(id, body.friend_id);
+        return {
+            message: "oke",
+            data,
+        };
+    }
 }

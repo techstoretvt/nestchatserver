@@ -1,6 +1,11 @@
 /** @format */
 
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import {
+    forwardRef,
+    MiddlewareConsumer,
+    Module,
+    NestModule,
+} from "@nestjs/common";
 import { UserController } from "../controllers/user.controller";
 import { IUserService } from "../../domain/interfaces/services/user.service.interface";
 import { UserRepositoryImpl } from "../../infrastructor/repositories/user.repository.impl";
@@ -22,8 +27,11 @@ import {
     Permission,
     PermissionSchema,
 } from "src/infrastructor/database/schemas/permission.schema";
+import { TestUsecase } from "src/application/usecases/UserUsecases";
+import { UpdateUserUsecase } from "src/application/usecases/UserUsecases/update-user.usecase";
+import { AuthModule } from "./auth.module";
 
-const ListUsercases = [];
+const ListUsercases = [TestUsecase, UpdateUserUsecase, UpdateUserUsecase];
 
 const ListServices = [];
 
@@ -48,9 +56,9 @@ const ListRepositories = [
                 schema: PermissionSchema,
             },
         ]),
-
         cacheConfig(),
         RoleModule,
+        forwardRef(() => AuthModule),
     ],
     controllers: [UserController],
     providers: [...ListUsercases, ...ListServices, ...ListRepositories],

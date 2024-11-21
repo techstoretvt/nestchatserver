@@ -52,13 +52,6 @@ export class AuthController {
         description: "User already exists",
     })
     async signUp(@Body() createUserDto: CreateUserDto) {
-        const checkPassword = PasswordUtils.validatePassword(
-            createUserDto.password,
-        );
-        if (checkPassword?.length > 0) {
-            throw new BadRequestException(checkPassword[0].message);
-        }
-
         let newUser: UserEntity =
             await this.signUpUseCase.execute(createUserDto);
 

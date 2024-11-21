@@ -1,11 +1,13 @@
 /** @format */
 
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { SignUpUseCase } from "../../application/usecases/UserUsecases/index";
 import {
-    AuthServiceImpl,
-    UserServiceImpl,
-} from "src/infrastructor/services/index";
+    forwardRef,
+    MiddlewareConsumer,
+    Module,
+    NestModule,
+} from "@nestjs/common";
+import { SignUpUseCase } from "../../application/usecases/UserUsecases/index";
+import { AuthServiceImpl } from "src/infrastructor/services/index";
 import { AuthController } from "../controllers/auth.controller";
 import { UserRepositoryImpl } from "src/infrastructor/repositories/index";
 import { UserModule } from "./user.module";
@@ -14,8 +16,7 @@ import {
     User,
     UserSchema,
 } from "src/infrastructor/database/schemas/user.schema";
-import { JwtModule } from "@nestjs/jwt";
-import { jwtTokenConstants } from "src/common/constants/jwt.constant";
+import { JwtModule, JwtService } from "@nestjs/jwt";
 import { SignInUseCase } from "src/application/usecases/UserUsecases/sign-in.usecase";
 import {
     AppTypeMiddleware,
@@ -39,7 +40,7 @@ const ListServices = [
 
 @Module({
     imports: [
-        UserModule,
+        forwardRef(() => UserModule),
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
         JwtModule.registerAsync({
             useFactory: async (configService: ConfigService) => ({

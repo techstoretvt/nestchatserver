@@ -15,6 +15,7 @@ import { UserEntity } from "src/domain/entities/user.entity";
 import mongoose from "mongoose";
 import { IUserRepository } from "src/domain/interfaces/repositories";
 import { TokenEntity } from "src/domain/entities/token.entity";
+import { UpdateUserDto } from "src/presentation/dtos";
 
 @Injectable()
 export class SignInUseCase {
@@ -46,7 +47,9 @@ export class SignInUseCase {
         }
 
         // update last login
-        await this.userRepository.updateUserLastLogin(user._id);
+        let updatedUser: UpdateUserDto = new UpdateUserDto();
+        updatedUser.last_login = new Date().getTime();
+        await this.userRepository.updateUser(updatedUser, user._id);
 
         // create tokens
         const accessToken = this.authService.createAccessToken(user);

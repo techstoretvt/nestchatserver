@@ -63,7 +63,7 @@ export class User {
     @Prop([
         {
             friend_id: { type: Types.ObjectId, ref: "User", required: true },
-            nickname: String,
+            nickname: { type: String },
             is_blocked: { type: Boolean, default: false },
             is_friend: { type: Boolean, default: true },
         },
