@@ -18,10 +18,108 @@ import {
     UserProvider,
 } from "src/common/constants";
 import { FriendEntity } from "src/domain/entities/friend.entity";
+import { UpdateFriendDto } from "src/presentation/dtos/update-friend.dto";
+import { SettingUserEntity } from "src/domain/entities/setting-user.entity";
+import { UpdateSettingUserDto } from "src/presentation/dtos/update-setting-user.dto";
 
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+
+    async updateSettings(
+        user_id: string,
+        updateSettingUserDto: UpdateSettingUserDto,
+    ): Promise<SettingUserEntity> {
+        const settingEntity: SettingUserEntity = {
+            setting_name: updateSettingUserDto.setting_name,
+            setting_value: updateSettingUserDto.setting_value,
+        };
+
+        // check user
+        const user = await this.userModel.findById(user_id).exec();
+        if (!user) {
+            throw new NotFoundException(`User not found with id ${user_id}`);
+        }
+
+        // check setting exits
+        const setting = user.settings.find(
+            (setting) => setting.name === updateSettingUserDto.setting_name,
+        );
+
+        if (!setting) {
+            // add new setting
+            user.settings.push({
+                name: updateSettingUserDto.setting_name,
+                value: updateSettingUserDto.setting_value,
+            });
+            await user.save();
+
+            return settingEntity;
+        }
+
+        await this.userModel.findOneAndUpdate(
+            {
+                _id: user_id,
+                "settings.name": updateSettingUserDto.setting_name,
+            },
+            {
+                $set: {
+                    "settings.$.value": updateSettingUserDto.setting_value,
+                },
+            },
+        );
+
+        return settingEntity;
+    }
+
+    async updateFriend(
+        user_id: string,
+        friend_id: string,
+        updateFriendDto: UpdateFriendDto,
+    ): Promise<FriendEntity> {
+        // check user
+        const user = await this.userModel.findById(user_id).exec();
+        if (!user) {
+            throw new NotFoundException(`User not found with id ${user_id}`);
+        }
+
+        // check friend exits
+        let friend = user.friends.find(
+            (friend) => friend.friend_id.toString() === friend_id,
+        );
+
+        if (!friend) {
+            throw new NotFoundException(
+                `Friend not found with id ${friend_id}`,
+            );
+        }
+
+        // update friend
+        const result = await this.userModel.findOneAndUpdate(
+            { _id: user_id, "friends.friend_id": friend_id },
+            {
+                $set: {
+                    "friends.$": updateFriendDto,
+                },
+            },
+            {
+                new: true,
+            },
+        );
+        let friendUpdate = result.friends.find(
+            (friend) => friend.friend_id.toString() === friend_id,
+        );
+
+        const friendEntity: FriendEntity = {
+            user_id: user_id,
+            friend_id: friend_id,
+            nickname: friendUpdate.nickname,
+            is_blocked: friendUpdate.is_blocked,
+            is_friend: friendUpdate.is_friend,
+        };
+
+        return friendEntity;
+    }
 
     async addFriend(user_id: string, friend_id: string): Promise<FriendEntity> {
         // check user
