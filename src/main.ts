@@ -7,6 +7,7 @@ import { HttpExceptionFilter } from "./common/filters/http_exception.filter";
 import { setupSwagger } from "./configs/swagger.config";
 import { ValidationPipe } from "@nestjs/common";
 import { join } from "path";
+import cookieParser from "cookie-parser";
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -14,6 +15,9 @@ async function bootstrap() {
     app.useStaticAssets(join(__dirname, "..", "public"), {
         prefix: "/public/",
     });
+
+    // cookie
+    app.use(cookieParser());
 
     // guard
 

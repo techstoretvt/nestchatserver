@@ -12,4 +12,12 @@ export interface IAuthService {
         refreshToken: string,
         client_id: string,
     ): Promise<void>;
+    removeRefreshToken(userId: string, client_id: string): Promise<void>;
+    verifyRefreshToken(refreshToken: string): any;
+    verifyAccessToken(accessToken: string): any;
+    checkTokenInRedis(
+        user_id: string,
+        client_id: string,
+        refreshToken: string,
+    ): Promise<boolean>;
 }

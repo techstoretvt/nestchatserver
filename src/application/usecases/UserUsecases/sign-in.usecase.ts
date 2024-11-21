@@ -14,6 +14,7 @@ import { JwtService } from "@nestjs/jwt";
 import { UserEntity } from "src/domain/entities/user.entity";
 import mongoose from "mongoose";
 import { IUserRepository } from "src/domain/interfaces/repositories";
+import { TokenEntity } from "src/domain/entities/token.entity";
 
 @Injectable()
 export class SignInUseCase {
@@ -23,7 +24,10 @@ export class SignInUseCase {
         private readonly userRepository: IUserRepository,
     ) {}
 
-    async execute(signInDto: SignInDto, client_id: string) {
+    async execute(
+        signInDto: SignInDto,
+        client_id: string,
+    ): Promise<TokenEntity> {
         let user: UserEntity = await this.userRepository.getUserByUsername(
             signInDto.username,
         );
@@ -47,10 +51,11 @@ export class SignInUseCase {
         // create tokens
         const accessToken = this.authService.createAccessToken(user);
         const refreshToken = this.authService.createRefreshToken(user);
+        const tokenEntity: TokenEntity = { accessToken, refreshToken };
 
         // save refresh Token to redis
         this.authService.saveRefreshToken(user._id, refreshToken, client_id);
 
-        return { accessToken, refreshToken };
+        return tokenEntity;
     }
 }

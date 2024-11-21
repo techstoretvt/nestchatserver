@@ -17,9 +17,20 @@ import {
 import { JwtModule } from "@nestjs/jwt";
 import { jwtTokenConstants } from "src/common/constants/jwt.constant";
 import { SignInUseCase } from "src/application/usecases/UserUsecases/sign-in.usecase";
-import { AppTypeMiddleware } from "src/middleware/app.middleware";
+import {
+    AppTypeMiddleware,
+    ClientIDMiddleware,
+} from "src/middleware/app.middleware";
+import { RefreshTokenUseCase } from "src/application/usecases/UserUsecases/refresh-token.usecase";
+import { ConfigService } from "@nestjs/config";
+import { LogoutUsecase } from "src/application/usecases/UserUsecases/logout.usecase";
 
-const ListUsercases = [SignUpUseCase, SignInUseCase];
+const ListUsercases = [
+    SignUpUseCase,
+    SignInUseCase,
+    RefreshTokenUseCase,
+    LogoutUsecase,
+];
 
 const ListServices = [
     { provide: "IAuthService", useClass: AuthServiceImpl },
@@ -30,10 +41,11 @@ const ListServices = [
     imports: [
         UserModule,
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-        JwtModule.register({
-            global: true,
-            secret: jwtTokenConstants.accessTokenSecret,
-            signOptions: { expiresIn: jwtTokenConstants.accessTokenExp },
+        JwtModule.registerAsync({
+            useFactory: async (configService: ConfigService) => ({
+                secret: configService.get<string>("ACCESS_TOKEN_SECRET"),
+            }),
+            inject: [ConfigService],
         }),
     ],
     controllers: [AuthController],
@@ -42,6 +54,14 @@ const ListServices = [
 })
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AppTypeMiddleware).forRoutes("auth/signin");
+        consumer
+            .apply(AppTypeMiddleware, ClientIDMiddleware)
+            .forRoutes("auth/signin");
+
+        consumer
+            .apply(AppTypeMiddleware, ClientIDMiddleware)
+            .forRoutes("auth/refresh");
+
+        consumer.apply(ClientIDMiddleware).forRoutes("auth/logout");
     }
 }

@@ -1,7 +1,7 @@
 /** @format */
 
 import { UserEntity } from "src/domain/entities/user.entity";
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { IAuthService } from "src/domain/interfaces/services/auth.service.interface";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
@@ -19,6 +19,51 @@ export class AuthServiceImpl implements IAuthService {
     ) {
         this.redis = this.redisService.getOrThrow();
     }
+    async removeRefreshToken(userId: string, client_id: string): Promise<void> {
+        await this.redis.del(getUserRefreshTokenKey(userId, client_id));
+    }
+
+    async checkTokenInRedis(
+        user_id: string,
+        client_id: string,
+        refreshToken: string,
+    ): Promise<boolean> {
+        let token = await this.redis.get(
+            getUserRefreshTokenKey(user_id, client_id),
+        );
+        if (!token) {
+            return false;
+        }
+
+        if (token !== refreshToken) {
+            return false;
+        }
+
+        return true;
+    }
+
+    verifyAccessToken(accessToken: string) {
+        try {
+            const decoded = this.jwtService.verify(accessToken, {
+                secret: process.env.ACCESS_TOKEN_SECRET,
+            });
+            return decoded;
+        } catch (error) {
+            throw new InternalServerErrorException(error.message);
+        }
+    }
+
+    verifyRefreshToken(refreshToken: string): any {
+        try {
+            const decoded = this.jwtService.verify(refreshToken, {
+                secret: process.env.REFRESH_TOKEN_SECRET,
+            });
+            return decoded;
+        } catch (error) {
+            throw new InternalServerErrorException(error.message);
+        }
+    }
+
     async saveRefreshToken(
         userId: string,
         refreshToken: string,
@@ -39,7 +84,7 @@ export class AuthServiceImpl implements IAuthService {
     createRefreshToken(userEntity: UserEntity): string {
         const payload = { id: userEntity._id, role: userEntity.role };
         return this.jwtService.sign(payload, {
-            secret: jwtTokenConstants.refreshTokenSecret,
+            secret: process.env.REFRESH_TOKEN_SECRET,
             expiresIn: jwtTokenConstants.refreshTokenExp,
         });
     }
