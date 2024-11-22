@@ -28,4 +28,7 @@ export interface IUserRepository {
         user_id: string,
         updateSettingUserDto: UpdateSettingUserDto,
     ): Promise<SettingUserEntity>;
+    addDefaultSettingAllUser(
+        updateSettingUserDto: UpdateSettingUserDto,
+    ): Promise<SettingUserEntity>;
 }

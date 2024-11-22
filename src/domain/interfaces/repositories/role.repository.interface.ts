@@ -6,4 +6,5 @@ export interface IRoleRepository {
     seedRole(): Promise<void>;
     seedPermission(): Promise<void>;
     getRoleByName(name: string): Promise<RoleEntity>;
+    getRoleById(id: string): Promise<RoleEntity>;
 }

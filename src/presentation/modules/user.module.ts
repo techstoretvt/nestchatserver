@@ -30,8 +30,14 @@ import {
 import { TestUsecase } from "src/application/usecases/UserUsecases";
 import { UpdateUserUsecase } from "src/application/usecases/UserUsecases/update-user.usecase";
 import { AuthModule } from "./auth.module";
+import { AddDefaultSettingUseCase } from "src/application/usecases/UserUsecases/add-default-setting.usecase";
 
-const ListUsercases = [TestUsecase, UpdateUserUsecase, UpdateUserUsecase];
+const ListUsercases = [
+    TestUsecase,
+    UpdateUserUsecase,
+    UpdateUserUsecase,
+    AddDefaultSettingUseCase,
+];
 
 const ListServices = [];
 

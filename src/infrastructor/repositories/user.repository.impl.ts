@@ -15,6 +15,7 @@ import { CreateUserDto, UpdateUserDto } from "src/presentation/dtos";
 import {
     avatarDefault,
     RoleNameConstants,
+    SettingUserDefault,
     UserProvider,
 } from "src/common/constants";
 import { FriendEntity } from "src/domain/entities/friend.entity";
@@ -25,6 +26,31 @@ import { UpdateSettingUserDto } from "src/presentation/dtos/update-setting-user.
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+    async addDefaultSettingAllUser(
+        updateSettingUserDto: UpdateSettingUserDto,
+    ): Promise<SettingUserEntity> {
+        let result = await this.userModel.updateMany(
+            { "settings.name": { $ne: updateSettingUserDto.setting_name } },
+            {
+                $addToSet: {
+                    settings: {
+                        name: updateSettingUserDto.setting_name,
+                        value: updateSettingUserDto.setting_value,
+                    },
+                },
+            },
+        );
+        if (result.modifiedCount === 0) {
+            return null;
+        }
+
+        const settingEntity: SettingUserEntity = {
+            setting_name: updateSettingUserDto.setting_name,
+            setting_value: updateSettingUserDto.setting_value,
+        };
+
+        return settingEntity;
+    }
 
     async updateSettings(
         user_id: string,
@@ -259,6 +285,7 @@ export class UserRepositoryImpl implements IUserRepository {
                     provider: UserProvider.LOCAL,
                 },
                 role: role_id,
+                settings: SettingUserDefault,
             });
             await createdUser.save();
             let newUser = plainToInstance(UserEntity, createdUser, {

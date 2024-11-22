@@ -7,6 +7,7 @@ import { Model } from "mongoose";
 import { Permission } from "../database/schemas/permission.schema";
 import { RoleEntity } from "src/domain/entities/role.entity";
 import { plainToInstance } from "class-transformer";
+import { NotFoundException } from "@nestjs/common";
 
 export class RoleResitoryImpl implements IRoleRepository {
     constructor(
@@ -14,6 +15,25 @@ export class RoleResitoryImpl implements IRoleRepository {
         @InjectModel(Permission.name)
         private permissionModel: Model<Permission>,
     ) {}
+
+    async getRoleById(id: string): Promise<RoleEntity> {
+        const role = await this.roleModel.findById(id).exec();
+        if (!role) {
+            throw new NotFoundException(`Role not found with id ${id}`);
+        }
+
+        let roleEntity: RoleEntity = {
+            _id: role._id.toString(),
+            role_name: role.role_name,
+            role_description: role.role_description,
+            permissions: role.permissions.map((item) => ({
+                permission_id: item.permission_id.toString(),
+            })),
+        };
+
+        return roleEntity;
+    }
+
     async getRoleByName(name: string): Promise<RoleEntity> {
         let role = await this.roleModel.findOne({ role_name: name }).exec();
         if (!role) return null;

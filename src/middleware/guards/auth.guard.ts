@@ -27,7 +27,10 @@ export class AuthGuard implements CanActivate {
 
         const decodedToken = this.authService.verifyAccessToken(accessToken);
 
-        request.user_id = decodedToken.id;
+        request.user = {
+            id: decodedToken.id,
+            role_id: decodedToken.role,
+        };
 
         return true;
     }

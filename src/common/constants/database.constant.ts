@@ -15,3 +15,18 @@ export const RoleNameConstants = {
     SUPERADMIN: "super_admin",
     MODERATOR: "moderator",
 };
+
+export const SettingUserDefault = [
+    {
+        name: "theme",
+        value: "light",
+    },
+    {
+        name: "language",
+        value: "en",
+    },
+    {
+        name: "allow_non_friends_to_message",
+        value: "true",
+    },
+];
