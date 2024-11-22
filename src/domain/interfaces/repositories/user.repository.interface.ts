@@ -9,16 +9,31 @@ import { UpdateSettingUserDto } from "src/presentation/dtos/update-setting-user.
 import { SettingUserEntity } from "src/domain/entities/setting-user.entity";
 
 export interface IUserRepository {
+    //#region Get methob
     getUserByUsername(username: string): Promise<UserEntity>;
-    createUser(user: CreateUserDto, role_id: string): Promise<UserEntity>;
     getUserById(user_id: string): Promise<UserEntity>;
-    createSuperAdmin(): Promise<void>;
-    seedUser(data?: any): Promise<void>;
+    addDefaultSettingAllUser(
+        updateSettingUserDto: UpdateSettingUserDto,
+    ): Promise<SettingUserEntity>;
+    getFriendByFriendId(
+        user_id: string,
+        friend_id: string,
+    ): Promise<FriendEntity>;
+    getFriendByUserId(user_id: string): Promise<FriendEntity[]>;
+    getSettingByName(
+        user_id: string,
+        setting_name: string,
+    ): Promise<SettingUserEntity>;
+    getSettingByUserId(user_id: string): Promise<SettingUserEntity[]>;
+    getListBlockedFriend(user_id: string): Promise<FriendEntity[]>;
+
+    //#endregion
+
+    //#region Patch methob
     updateUser(
         updateUserDto: UpdateUserDto,
         user_id: string,
     ): Promise<UserEntity>;
-    addFriend(user_id: string, friend_id: string): Promise<FriendEntity>;
     updateFriend(
         user_id: string,
         friend_id: string,
@@ -28,7 +43,12 @@ export interface IUserRepository {
         user_id: string,
         updateSettingUserDto: UpdateSettingUserDto,
     ): Promise<SettingUserEntity>;
-    addDefaultSettingAllUser(
-        updateSettingUserDto: UpdateSettingUserDto,
-    ): Promise<SettingUserEntity>;
+    //#endregion
+
+    //#region Post methob
+    seedUser(data?: any): Promise<void>;
+    createUser(user: CreateUserDto, role_id: string): Promise<UserEntity>;
+    createSuperAdmin(): Promise<void>;
+    addFriend(user_id: string, friend_id: string): Promise<FriendEntity>;
+    //#endregion
 }

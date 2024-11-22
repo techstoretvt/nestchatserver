@@ -30,3 +30,9 @@ export const SettingUserDefault = [
         value: "true",
     },
 ];
+
+export const StatusFriendRequest = {
+    PENDING: "pending",
+    ACCEPTED: "accepted",
+    DECLINED: "declined",
+};

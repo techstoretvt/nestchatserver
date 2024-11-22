@@ -26,6 +26,106 @@ import { UpdateSettingUserDto } from "src/presentation/dtos/update-setting-user.
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+
+    async getListBlockedFriend(user_id: string): Promise<FriendEntity[]> {
+        const user = await this.userModel
+            .findOne(
+                { _id: user_id, "friends.is_friend": true },
+                { friends: 1 },
+            )
+            .exec();
+        if (!user) return null;
+
+        const friendEntity: FriendEntity[] = user.friends.map((item) => ({
+            user_id: user_id,
+            friend_id: item.friend_id.toString(),
+            nickname: item.nickname,
+            is_blocked: item.is_blocked,
+            is_friend: item.is_friend,
+        }));
+
+        return friendEntity;
+    }
+
+    async getSettingByUserId(user_id: string): Promise<SettingUserEntity[]> {
+        const user = await this.userModel
+            .findOne({ _id: user_id }, { settings: 1 })
+            .exec();
+
+        if (!user) return null;
+
+        const settingEntity: SettingUserEntity[] = user.settings.map(
+            (item) => ({
+                setting_name: item.name,
+                setting_value: item.value,
+            }),
+        );
+
+        return settingEntity;
+    }
+    async getSettingByName(
+        user_id: string,
+        setting_name: string,
+    ): Promise<SettingUserEntity> {
+        const setting = await this.userModel
+            .findOne(
+                { _id: user_id },
+                { settings: { $elemMatch: { setting_name: setting_name } } },
+            )
+            .exec();
+
+        if (!setting) return null;
+
+        const settingEntity: SettingUserEntity = {
+            setting_name: setting.settings[0].name,
+            setting_value: setting.settings[0].value,
+        };
+
+        return settingEntity;
+    }
+
+    async getFriendByUserId(user_id: string): Promise<FriendEntity[]> {
+        const friends = await this.userModel
+            .findOne({ _id: user_id }, { friends: 1 })
+            .exec();
+
+        if (!friends) return null;
+
+        const FriendEntity: FriendEntity[] = friends.friends.map((friend) => ({
+            user_id: user_id,
+            friend_id: friend.friend_id.toString(),
+            nickname: friend.nickname,
+            is_blocked: friend.is_blocked,
+            is_friend: friend.is_friend,
+        }));
+
+        return FriendEntity;
+    }
+
+    async getFriendByFriendId(
+        user_id: string,
+        friend_id: string,
+    ): Promise<FriendEntity> {
+        const friend = await this.userModel
+            .findOne(
+                { _id: user_id, "friends.friend_id": friend_id },
+                { "friends.$": 1 },
+            )
+            .exec();
+
+        if (!friend) return null;
+
+        const FriendEntity: FriendEntity = {
+            user_id: user_id,
+            friend_id: friend_id,
+            nickname: friend.friends[0].nickname,
+            is_blocked: friend.friends[0].is_blocked,
+            is_friend: friend.friends[0].is_friend,
+        };
+
+        return FriendEntity;
+    }
+
     async addDefaultSettingAllUser(
         updateSettingUserDto: UpdateSettingUserDto,
     ): Promise<SettingUserEntity> {

@@ -15,8 +15,15 @@ import { AuthModule } from "./presentation/modules/auth.module";
 import { SeedService } from "./infrastructor/services/seed.service.impl";
 import { RoleModule } from "./presentation/modules/role.module";
 import { RedisModule } from "@liaoliaots/nestjs-redis";
+import { FriendRequestMobule } from "./presentation/modules/friend-request.module";
 
-const AppModules = [AuthModule, UserModule, ChatModule, RoleModule];
+const AppModules = [
+    AuthModule,
+    UserModule,
+    ChatModule,
+    RoleModule,
+    FriendRequestMobule,
+];
 
 const OtherModules = [
     ConfigModule.forRoot({
